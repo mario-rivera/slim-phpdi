@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  php-fpm:
+    build: ./docker/php
+    image: mrivera/php-fpm:7.1
+    container_name: mrivera-phpfpm
+    volumes:
+      - .:/www
+    networks: 
+      - mrivera
+    user: ${CURRENT_UID}
+    command: bash /www/docker/shell/php-fpm.sh
+    
+  nginx:
+    image: nginx:1.15
+    container_name: mrivera-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks: 
+      - mrivera
+    depends_on:
+      - php-fpm
+      
+networks:
+  mrivera:
+    name: mrivera/dev
